@@ -40,16 +40,20 @@ const auth = {
     })
   },
   logout() {
-    return HTTP.delete(constants.LOGOUT_URL)
-      .then(response => {
-        LocalStorage.clear()
-        return Promise.resolve(response.data)
-    })
-      .catch(error => {
-        return Promise.reject({
-          message: error.response.data ? error.response.data.error : 'An error has occurred'
-        })
-      })
+    // return HTTP.delete(constants.LOGOUT_URL)
+    //   .then(response => {
+    //     LocalStorage.clear()
+    //     return Promise.resolve(response.data)
+    // })
+    //   .catch(error => {
+    //     return Promise.reject({
+    //       message: error.response.data ? error.response.data.error : 'An error has occurred'
+    //     })
+    //   })
+
+    //TODO: resolver problema circular
+
+    LocalStorage.clear()
 
   }
 }

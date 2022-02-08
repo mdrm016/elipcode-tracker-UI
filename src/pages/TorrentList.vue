@@ -21,7 +21,7 @@
         <template v-slot:body-cell-action="props">
           <q-td :props="props">
             <q-btn
-              color="blue"
+              color="amber"
               icon="download"
               round
               flat
@@ -101,7 +101,23 @@ export default {
       loading,
 
       downloadTorrent(torrentRow) {
-        console.log(torrentRow)
+        HTTP.get(`/torrents/get_torrent_file/${torrentRow.torrent_id}`, {
+          headers: {
+            'Accept': 'application/x-bittorrent'
+          },
+          responseType: 'blob' })
+        .then(response => {
+          // const blob = new Blob([response.data], { type: response.data.type });
+          let blob = response.data
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `${torrentRow.name}.torrent`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        })
+        .catch(error => {
+          console.log(error)
+        })
       }
     }
 

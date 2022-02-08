@@ -25,7 +25,9 @@ HTTP.interceptors.response.use(async function (response) {
   return response;
 }, function (error) {
   if(error.response) {
+    console.log(error.response)
     if(error.response.status === 401 && error.response.data && error.response.data.error === 'Token has expired') {
+      console.log(error.response.data.error)
       auth.logout();
       router.push(constants.AUTH_URL);
     }
