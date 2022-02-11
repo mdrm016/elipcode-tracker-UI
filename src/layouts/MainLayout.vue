@@ -59,14 +59,12 @@
         <q-btn-dropdown stretch flat :label="username" style="background: none">
           <q-list color="dark">
 
-<!--            <q-item-label header>User</q-item-label>-->
-
             <q-item clickable v-close-popup tabindex="0" to="/perfil">
               <q-item-section avatar>
                 <q-avatar icon="account_circle" color="dark" text-color="amber" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="menu-item-style">Perfil</q-item-label>
+                <q-item-label class="menu-item-style">Profile</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -100,6 +98,39 @@
             </q-item>
           </q-list>
 
+        </q-btn-dropdown>
+
+        <q-btn-dropdown stretch flat label="Support" style="background: none">
+          <q-list color="dark">
+
+            <q-item clickable v-close-popup tabindex="0" to="/perfil">
+              <q-item-section avatar>
+                <q-avatar icon="done" color="dark" text-color="amber" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="menu-item-style">Rules</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-close-popup tabindex="0" to="/perfil">
+              <q-item-section avatar>
+                <q-avatar icon="info" color="dark" text-color="amber" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="menu-item-style">FAQ</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item clickable v-close-popup tabindex="0" to="/perfil">
+              <q-item-section avatar>
+                <q-avatar icon="textsms" color="dark" text-color="amber" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="menu-item-style">Helpdesk</q-item-label>
+              </q-item-section>
+            </q-item>
+
+          </q-list>
         </q-btn-dropdown>
 
 <!--        <div>Quasar v{{ $q.version }}</div>-->
