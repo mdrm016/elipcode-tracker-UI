@@ -8,3 +8,25 @@
 .text-app-color-primary {
   color: #FFAB00;
 }
+
+.thumbnail-app {
+  cursor: pointer;
+}
+
+.thumbnail-app img {
+  width: 100px;
+  margin: auto;
+}
+
+.item-label-dark {
+  color: white;
+  padding: 20px;
+  font-size: .875rem;
+  //font-weight: bold;
+  line-height: 1.25rem;
+  letter-spacing: .01786em;
+}
+
+.bg-grey-navbar {
+  background: #141414
+}

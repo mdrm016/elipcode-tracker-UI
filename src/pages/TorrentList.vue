@@ -9,35 +9,55 @@
     <div class="q-pa-md">
       <q-table
         title="Torrents"
-        :rows="torrent_list"
+        :rows="rows"
         :columns="columns"
-        row-key="name"
+        v-model:pagination="pagination"
+        :filter="filter"
+        :loading="loading"
+        @request="onRequest"
+        binary-state-sort
         dark
         color="amber"
-        :pagination="pagination"
-        :loading="loading"
       >
+        <template v-slot:top-right>
+          <q-input class="full-width" borderless dense debounce="300" v-model="filter" placeholder="Search" dark filled
+                   color="dark">
+            <template v-slot:append>
+              <q-icon name="search"/>
+            </template>
+          </q-input>
+        </template>
 
-        <template v-slot:body-cell-action="props">
-          <q-td :props="props">
-            <q-btn
-              color="amber"
-              icon="download"
-              round
-              flat
-              dense
-              @click="downloadTorrent(props.row)"
-            />
-          </q-td>
+        <template v-slot:body="props">
+          <q-tr :props="props">
+            <q-td
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+            >
+              <template v-ripple v-if="col.name === 'cover'">
+                <div @click="goToTorrentView(props.row)">
+                  <q-img :src="`${getMediaBackend()}/${props.row.cover.path}`" class="rounded-borders" style="min-width: 75px; height: 100px;"/>
+                </div>
+              </template>
+              <template v-else>
+                <template v-if="col.name === 'action'">
+                  <q-btn color="amber" icon="download" round
+                         flat dense @click="downloadTorrent(props.row)"/>
+                </template>
+                <template v-else>
+                  {{ col.value }}
+                </template>
+              </template>
+
+            </q-td>
+          </q-tr>
         </template>
 
         <template v-slot:no-data="{ icon, message, filter }">
-          <div class="full-width row flex-center text-accent q-gutter-sm">
-            <q-icon size="2em" name="sentiment_dissatisfied"/>
-            <span>
-            Well this is sad... {{ message }}
-          </span>
-            <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon"/>
+          <div class="full-width row flex-center q-gutter-sm">
+            <span class="text-app-color-primary"> {{ message }} </span>
+            <q-icon class="text-app-color-primary" size="2em" :name="filter ? 'filter_b_and_w' : icon"/>
           </div>
         </template>
 
@@ -49,31 +69,62 @@
 
 <script>
 import {HTTP} from "src/http";
-import {useQuasar} from "quasar";
+import {date, useQuasar} from "quasar";
 import {onMounted, ref} from "vue";
+import constants from "src/constants";
+import {useRouter} from "vue-router";
+import {downloadTorrent} from "src/utils";
+
 
 const columns = [
+  {name: 'cover', label: '', align: 'center', field: 'cover'},
+  {
+    name: 'category',
+    label: 'Category',
+    align: 'left',
+    field: row => row.categories.find(x => x.principal).name,
+    sortable: true
+  },
+  {
+    name: 'date',
+    label: 'Upload date',
+    align: 'center',
+    field: row => date.formatDate(row.uploaded_time, 'YYYY-MM-DD HH:mm:ss'),
+    sortable: true
+  },
   {name: 'name', label: 'Name', align: 'left', field: 'name', sortable: true},
-  {name: 'category', label: 'Category', align: 'left', field: 'category', sortable: true},
   {name: 'seeders', align: 'center', label: 'Seeders', field: 'seeders'},
   {name: 'leechers', align: 'center', label: 'Leechers', field: 'leechers'},
-  {name: 'action', align: 'center', label: 'Acciones', field: 'action'}
+  {name: 'action', align: 'center', label: 'Actions', field: 'action'}
 ]
 
 export default {
   setup() {
 
     const $q = useQuasar()
+    const router = useRouter()
 
-    const torrent_list = ref([])
+    const rows = ref([])
+    const filter = ref('')
     const loading = ref(false)
+    const pagination = ref({
+      sortBy: 'desc',
+      descending: false,
+      page: 1,
+      rowsPerPage: 20
+      // rowsNumber: xx if getting data from a server
+    })
 
-    const get_announce = () => {
-      HTTP.get('/torrents')
+    const onRequest = (props) => {
+      const {page, rowsPerPage, sortBy, descending} = props.pagination
+      const filter = props.filter
+
+      loading.value = true
+
+      // TODO: sincronize with backend
+      HTTP.post('/search/torrents', {})
         .then(response => {
-          loading.value = true
-          console.log(response.data.items)
-          torrent_list.value = response.data.items
+          rows.value = response.data.items
         })
         .catch(error => {
           $q.notify({
@@ -88,37 +139,33 @@ export default {
         )
     }
 
+    const getMediaBackend = () => {
+      return constants.STORAGE_BACKEND_URL
+    }
+
+    const goToTorrentView = (row) => {
+      let routeResolved = router.resolve({path: "torrentview", query: {id: row.id}})
+      window.open(routeResolved.href, '_blank');  // To new tab
+    }
+
     onMounted(() => {
-      get_announce()
+      onRequest({
+        pagination: pagination.value,
+        filter: undefined
+      })
     })
 
     return {
-      columns,
-      torrent_list,
-      pagination: {
-        rowsPerPage: 30 // current rows per page being displayed
-      },
+      filter,
       loading,
+      pagination,
+      columns,
+      rows,
 
-      downloadTorrent(torrentRow) {
-        HTTP.get(`/torrents/get_torrent_file/${torrentRow.torrent_id}`, {
-          headers: {
-            'Accept': 'application/x-bittorrent'
-          },
-          responseType: 'blob' })
-        .then(response => {
-          // const blob = new Blob([response.data], { type: response.data.type });
-          let blob = response.data
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = `${torrentRow.name}.torrent`;
-          link.click();
-          URL.revokeObjectURL(link.href);
-        })
-        .catch(error => {
-          console.log(error)
-        })
-      }
+      onRequest,
+      downloadTorrent,
+      getMediaBackend,
+      goToTorrentView,
     }
 
   }
