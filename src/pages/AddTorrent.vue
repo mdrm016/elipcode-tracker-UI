@@ -10,7 +10,14 @@
 
       <q-card-section>
         <div class="text-subtitle1">
-          Your announce url: <b class="text-subtitle2 text-app-color-primary">{{ announce }}</b>
+          When you create the torrent, don't leave the tracker URL section blank, if you don't know what to put, add the following:
+          <b class="text-subtitle2 text-app-color-primary">{{ announce }}</b>
+        </div>
+<!--        <div class="text-subtitle1">-->
+<!--          Your announce url: <b class="text-subtitle2 text-app-color-primary">{{ announce }}</b>-->
+<!--        </div>-->
+        <div class="text-subtitle2">
+          Once the torrent is uploaded, re-download it and re-seed the files.
         </div>
       </q-card-section>
 
@@ -125,7 +132,7 @@
           </div>
           <div class="row">
             <div class="col text-center">
-              <q-toggle dark v-model="accept" label="I accept responsibility for the publication of this file o files"/>
+              <q-toggle dark v-model="accept" label="I accept responsibility for the publication of this torrent and the files contains"/>
               <div class="text-center">
                 <q-btn label="Submit" type="submit" color="dark" text-color="amber" :disable="!accept"
                        :loading="loading"/>
@@ -199,7 +206,7 @@ export default {
         })
     }
 
-    const insertCategory = () => {
+    const insertCategory = () => {  //Limmited to 5 categories
       if (categoriesSelected.value.length < categories.value.length &&
         categoriesSelected.value.at(-1) != null && categoriesSelected.value.length <= 4) {
         categoriesSelected.value.push(null)
@@ -243,9 +250,6 @@ export default {
             message: 'You need to accept the license and terms first'
           })
         } else {
-          //TODO: limitar a 5 categorias
-          //TODO: validate before processing
-
           // Processing data
           let categories = categoriesSelected.value.filter(x => x != null) // Delete nulls
 
@@ -263,14 +267,14 @@ export default {
           HTTP.post('/torrents', torrentFormData)
             .then(response => {
               // return to page view
+              router.push({path: '/torrentview', query: {id: response.data.id}})
+              // show message
               $q.notify({
                 color: 'green-4',
                 textColor: 'white',
                 icon: 'cloud_done',
                 message: response.data.msg
               })
-              // TODO: Posteriormente se debe redirigir a pantalla de visualización
-              router.push({path: '/torrentlist'})
             })
             .catch(error => {
               console.log(error)

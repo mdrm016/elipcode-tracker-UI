@@ -18,12 +18,12 @@
 
               <q-input dark standout type="password" v-model="newUser.password" label="Password" ref="passwordRef"
                        color="dark" required maxlength="15" lazy-rules
-                       :rules="[ val => val.length >= 6 || 'Please use minimum 3 characters']"/>
+                       :rules="[ val => val.length >= 6 || 'Please use minimum 6 characters']"/>
 
               <q-input dark standout type="password" v-model="newUser.repeatpassword" label="Repeat Password"
                        ref="repeatPasswordRef"
                        color="dark" required maxlength="15" lazy-rules
-                       :rules="[ val => val.length >= 6 || 'Please use minimum 3 characters',
+                       :rules="[ val => val.length >= 6 || 'Please use minimum 6 characters',
                        val => val === newUser.password || 'Passwords not equals']"/>
 
               <q-input dark standout type="email" v-model="newUser.email" label="Email"

@@ -15,7 +15,8 @@
           <div class="row q-ma-md">
             <div class="col-2">
               <!--Categoria principal-->
-              <q-img v-ripple :src="`${getMediaBackend()}/${instance.categories.find(x => x.principal).image_path}`" class="rounded-borders" style="height: 200px" :fit="'cover'">
+              <q-img v-ripple :src="`${getMediaBackend()}/${instance.categories.find(x => x.principal).image_path}`"
+                     class="rounded-borders" style="height: 200px" :fit="'cover'">
                 <q-tooltip anchor="top middle">
                   {{ `${instance.categories.find(x => x.principal).name}` }}
                 </q-tooltip>
@@ -24,7 +25,8 @@
             <!--Otras categorias-->
             <div class="col-1">
               <div class="row" v-for="(image, idx) in (instance.categories.filter(x => !x.principal))" :key="idx">
-                <q-img v-ripple :src="`${getMediaBackend()}/${image.image_path}`" class="rounded-borders" style="height: 50px" :fit="'cover'">
+                <q-img v-ripple :src="`${getMediaBackend()}/${image.image_path}`" class="rounded-borders"
+                       style="height: 50px" :fit="'cover'">
                   <q-tooltip anchor="top middle">
                     {{ `${image.name}` }}
                   </q-tooltip>
@@ -38,7 +40,8 @@
           <!--Buttons-->
           <div class="row q-ma-md">
             <div class="q-gutter-sm">
-              <q-btn color="grey-8" glossy label="Download" @click="downloadTorrent(instance)"/>
+              <q-btn color="grey-8" glossy label="Download" :loading="loadingTorrentFile"
+                     @click="downloadTorrent(instance)"/>
               <q-btn color="grey-8" label="Wishlist" icon="star_border"/>
             </div>
           </div>
@@ -72,7 +75,9 @@
 
           <!--Size-->
           <div class="q-ma-md">
-            {{ `${formatBytes(instance.info.total_length)} (${Number(instance.info.total_length).toLocaleString()} bytes)` }}
+            {{
+              `${formatBytes(instance.info.total_length)} (${Number(instance.info.total_length).toLocaleString()} bytes)`
+            }}
           </div>
 
           <q-separator color="grey-9" inset/>
@@ -122,7 +127,9 @@
 
           <!-- Peers -->
           <div class="q-ma-md">
-            {{ `${instance.seeders} Seeder(s) ${instance.leechers} Leecher(s) = ${instance.seeders + instance.leechers} Peer(s) connected` }}
+            {{
+              `${instance.seeders} Seeder(s) ${instance.leechers} Leecher(s) = ${instance.seeders + instance.leechers} Peer(s) connected`
+            }}
           </div>
 
           <!-- TODO: Seed Bonus functionality -->
@@ -145,10 +152,8 @@ import {onBeforeMount, ref} from "vue";
 import {HTTP} from "src/http";
 import {date, useQuasar} from "quasar";
 import constants from "src/constants";
-import { format } from 'quasar'
 import {formatBytes} from "src/utils";
 import MasonryWall from "@yeger/vue-masonry-wall";
-const { humanStorageSize } = format
 
 export default {
   name: 'TorrentView',
@@ -161,6 +166,7 @@ export default {
 
     const id = ref(route.query.id)
     const loading = ref(false)
+    const loadingTorrentFile = ref(false)
     const instance = ref(null)
 
     const onRequest = () => {
@@ -170,9 +176,9 @@ export default {
         .then(response => {
           instance.value = response.data
           instance.value.images = [instance.value.cover, ...instance.value.images]  //The cover first
-          instance.value.uploaded_time = date.formatDate(instance.value.uploaded_time, 'YYYY-MM-DD HH:mm:ss')
+          // instance.value.uploaded_time = date.formatDate(instance.value.uploaded_time, 'YYYY-MM-DD HH:mm:ss')
           document.title = instance.value.name
-          console.log(instance.value)
+          // console.log(instance.value)
         })
         .catch(error => {
           $q.notify({
@@ -192,23 +198,31 @@ export default {
     }
 
     const downloadTorrent = (torrent) => {
+      loadingTorrentFile.value = true
       HTTP.get(`/torrents/get_torrent_file/${torrent.id}`, {
         headers: {
           'Accept': 'application/x-bittorrent'
         },
         responseType: 'blob'
+      }).then(response => {
+        let filename = response.headers['x-filename'];
+        let blob = response.data
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
       })
-        .then(response => {
-          let filename = response.headers['x-filename'];
-          let blob = response.data
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = filename;
-          link.click();
-          URL.revokeObjectURL(link.href);
-        })
         .catch(error => {
-          console.log(error)
+          $q.notify({
+            color: 'red-5',
+            textColor: 'white',
+            icon: 'warning',
+            message: 'A error ocurred to obtain file.'
+          })
+        })
+        .finally(() => {
+          loadingTorrentFile.value = false
         })
     }
 
@@ -218,6 +232,7 @@ export default {
 
     return {
       loading,
+      loadingTorrentFile,
       instance,
 
       getMediaBackend,

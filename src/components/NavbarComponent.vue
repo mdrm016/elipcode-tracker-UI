@@ -46,6 +46,30 @@
 
       <q-btn stretch flat label="Forum" to="/forum"/>
 
+      <q-separator dark vertical/>
+
+      <div class="q-ml-md q-mr-md navbar-item">
+        <div class="text-body2 text-white text-center text-weight-light">UL: {{formatBytes(userStatistics.uploaded)}}</div>
+        <div class="text-body2 text-white text-center text-weight-light">DL: {{formatBytes(userStatistics.downloaded)}}</div>
+      </div>
+
+<!--      <q-separator dark vertical/>-->
+
+      <div class="q-ml-md q-mr-md navbar-item">
+        <div class="text-body2 text-white text-center text-weight-light navbar-option" @click="redirectTo('/profile')">
+          <q-icon name="north" color="green" size="sm" style="font-weight: bold"/> {{userStatistics.downloads}}
+          &nbsp;
+          <q-icon name="south" color="red" size="sm" style="font-weight: bold"/> {{userStatistics.uploads}}
+        </div>
+      </div>
+
+      <div class="q-ml-md q-mr-md navbar-item">
+        <div class="text-body2 text-white text-center text-weight-light navbar-option">
+          Ratio: {{ userStatistics.downloaded !== 0 ? (userStatistics.uploaded/userStatistics.downloaded) : '&infin;' }}
+        </div>
+        <div class="text-body2 text-white text-center text-weight-light navbar-option">Bonus: {{userStatistics.seed_bonus}}</div>
+      </div>
+
       <q-space/>
 
       <q-btn-dropdown stretch flat :label="username" style="background: none">
@@ -131,28 +155,56 @@
 </template>
 
 <script>
-import {LocalStorage} from "quasar";
+import {LocalStorage, useQuasar} from "quasar";
 import auth from "src/auth";
+import {useRouter} from "vue-router";
+import {HTTP} from "src/http";
+import {onMounted, ref} from "vue";
+import {formatBytes} from "src/utils";
 
 export default {
   name: 'NavbarComponent',
   setup() {
+    const $q = useQuasar()
+    const router = useRouter()
+
+    const userStatistics = ref({})
 
     const logout = () => {
       auth.logout()
-        .then(response => {
-          this.$router.push({path: '/login'})
-        })
-        .catch(error => {
-          console.log(error)
-          this.error = true
-          this.errorMessage = error
-        })
+        // .then(response => {
+        //   this.$router.push({path: '/login'})
+        // })
+        // .catch(error => {
+        //   console.log(error)
+        //   this.error = true
+        //   this.errorMessage = error
+        // })
+      router.push({path: '/login'})
     }
+
+    const redirectTo = (path) => {
+      router.push(path)
+    }
+
+    const onRequest = () => {
+      HTTP.get('/user/statistics').then(response => {
+        userStatistics.value = response.data
+        // console.log(userStatistics.value)
+      })
+    }
+
+    onMounted(() => {
+      onRequest()
+    })
 
     return {
       username: LocalStorage.getItem('currentUser'),
-      logout
+      userStatistics,
+
+      logout,
+      redirectTo,
+      formatBytes
     }
   }
 }
@@ -161,5 +213,16 @@ export default {
 <style>
 .q-menu {
   background: #141414;
+}
+
+.navbar-option:hover {
+  color: #ffc107 !important;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1060px) {
+  .navbar-item {
+    display: none !important;
+  }
 }
 </style>

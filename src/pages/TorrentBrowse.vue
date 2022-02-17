@@ -55,6 +55,10 @@
                       <q-banner rounded dark style="max-width: calc(30vw)">
                         <div class="q-ma-sm q-gutter-sm">
                           <p>{{ item.name }}</p>
+                          <p>{{ item.uploaded_time }}</p>
+                          <p>Size: {{ formatBytes(item.info.total_length) }} &nbsp;&nbsp; Seeders: {{item.seeders}} &nbsp; Leechers: {{item.leechers}}</p>
+                          <p>{{ item.info.files.length }} files</p>
+
                           <q-separator color="grey-9" inset/>
                           <div class="text-subtitle2">{{ item.description }}</div>
                         </div>
@@ -68,9 +72,7 @@
             </template>
           </masonry-wall>
 
-
         </div>
-
 
       </q-card>
     </div>
@@ -81,10 +83,10 @@
 <script>
 import {onMounted, ref} from "vue";
 import {HTTP} from "src/http";
-import {useQuasar} from "quasar";
+import {date, useQuasar} from "quasar";
 import {useRouter} from "vue-router";
 import MasonryWall from "@yeger/vue-masonry-wall";
-import {downloadTorrent, getMediaBackend} from "src/utils";
+import {downloadTorrent, getMediaBackend, formatBytes} from "src/utils";
 
 export default {
   name: 'TorrentBrowse',
@@ -153,7 +155,8 @@ export default {
 
       getMediaBackend,
       downloadTorrent,
-      goToTorrentView
+      goToTorrentView,
+      formatBytes
     }
   }
 }
