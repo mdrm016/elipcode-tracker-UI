@@ -120,7 +120,6 @@ export default {
       HTTP.post('/search/torrents', {})
         .then(response => {
           torrent_list.value = response.data.items
-          console.log(torrent_list.value)
         })
         .catch(error => {
           $q.notify({

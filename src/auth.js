@@ -20,7 +20,6 @@ const auth = {
       return username
     }).catch(error => {
       if(error && error.response) {
-        console.log(error.response.data.error)
         // Lets try to improve error messages to present them to the user
         switch(error.response.status) {
           case 400:
@@ -40,21 +39,16 @@ const auth = {
     })
   },
   logout() {
-    // return HTTP.delete(constants.LOGOUT_URL)
-    //   .then(response => {
-    //     LocalStorage.clear()
-    //     return Promise.resolve(response.data)
-    // })
-    //   .catch(error => {
-    //     return Promise.reject({
-    //       message: error.response.data ? error.response.data.error : 'An error has occurred'
-    //     })
-    //   })
-
-    //TODO: resolver problema circular
-
-    LocalStorage.clear()
-
+    return HTTP.delete(constants.LOGOUT_URL)
+      .then(response => {
+        LocalStorage.clear()
+        return Promise.resolve(response.data)
+    })
+      .catch(error => {
+        return Promise.reject({
+          message: error.response.data ? error.response.data.error : 'An error has occurred'
+        })
+      })
   }
 }
 

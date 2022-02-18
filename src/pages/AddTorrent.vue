@@ -53,7 +53,7 @@
                 </template>
                 <template v-slot:hint>
                   <p v-if="index === 0">Select <b>principal</b> category</p>
-                  <p v-else><b>Optional.</b> Select a category</p>
+                  <p v-else><b>Optional.</b> Select a subcategory</p>
                 </template>
               </q-select>
 

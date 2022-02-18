@@ -172,15 +172,14 @@ export default {
 
     const logout = () => {
       auth.logout()
-        // .then(response => {
-        //   this.$router.push({path: '/login'})
-        // })
-        // .catch(error => {
-        //   console.log(error)
-        //   this.error = true
-        //   this.errorMessage = error
-        // })
-      router.push({path: '/login'})
+        .then(() => {
+          router.push({path: '/login'})
+        })
+        .catch(error => {
+          console.log(error)
+          this.error = true
+          this.errorMessage = error
+        })
     }
 
     const redirectTo = (path) => {
@@ -190,7 +189,6 @@ export default {
     const onRequest = () => {
       HTTP.get('/user/statistics').then(response => {
         userStatistics.value = response.data
-        // console.log(userStatistics.value)
       })
     }
 

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import constants from './constants'
 import auth from "./auth";
-import router from "./router";
+import router from "./router/index";
 import {LocalStorage} from "quasar";
 
 export const HTTP = axios.create({
@@ -28,8 +28,10 @@ HTTP.interceptors.response.use(async function (response) {
     // console.log(error.response)
     if(error.response.status === 401 && error.response.data && error.response.data.error === 'Token has expired') {
       console.log(error.response.data.error)
-      auth.logout();
-      router.push(constants.AUTH_URL);
+      router().push(constants.AUTH_URL).then(() => {
+        auth.logout();
+        location.reload();
+      })
     }
   }
   return Promise.reject(error);
