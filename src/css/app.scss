@@ -30,3 +30,12 @@
 .bg-grey-navbar {
   background: #141414
 }
+
+.form-size-responsive {
+  width: calc(65vw)
+}
+@media (max-width:1000px){
+  .form-size-responsive{
+    width: calc(95vw)
+  }
+}

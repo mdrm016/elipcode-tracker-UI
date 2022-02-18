@@ -3,146 +3,136 @@
 
     <div class="q-pa-md">
 
-      <q-card-section>
-        <div class="text-h6 text-app-color-primary">Upload a torrent</div>
-      </q-card-section>
-      <q-separator inset color="white"></q-separator>
+      <div class="column items-center">
+        <q-card class="form-size-responsive" dark>
+          <q-card-section>
+            <div class="text-h6 text-app-color-primary">Upload a torrent</div>
+          </q-card-section>
 
-      <q-card-section>
-        <div class="text-subtitle1">
-          When you create the torrent, don't leave the tracker URL section blank, if you don't know what to put, add the following:
-          <b class="text-subtitle2 text-app-color-primary">{{ announce }}</b>
-        </div>
-<!--        <div class="text-subtitle1">-->
-<!--          Your announce url: <b class="text-subtitle2 text-app-color-primary">{{ announce }}</b>-->
-<!--        </div>-->
-        <div class="text-subtitle2">
-          Once the torrent is uploaded, re-download it and re-seed the files.
-        </div>
-      </q-card-section>
+          <q-separator color="grey-5" inset/>
 
-      <q-card-section>
-
-        <q-form
-          @submit="onSubmit"
-          @reset="onReset"
-          class="q-gutter-md"
-          color="dark"
-        >
-
-          <div class="row">
-            <div class="col-12 col-sm-6 q-pl-sm">
-              <q-input dark standout v-model="name" label="Torrent name *" color="dark"
-                       lazy-rules class="q-mb-md"
-                       :rules="[ val => val && val.length > 0 || 'Please type something']"
-              >
-                <template v-slot:hint>
-                  Use descriptive names
-                </template>
-              </q-input>
-
-              <q-select dark standout bottom-slots v-model="categoriesSelected[index]"
-                        :options="getCategoryList()" option-label="name" v-for="(item, index) in categoriesSelected"
-                        :key="index" :label="'Category' + (index === 0 ? ' *':'')" class="q-mb-md" color="dark">
-                <template v-slot:append v-if="categoriesSelected[index] != null">
-                  <q-icon name="close" @click.stop="deleteCategory(categoriesSelected[index])" class="cursor-pointer"/>
-                </template>
-                <template v-slot:after>
-                  <q-img v-if="item && item.image_path" :src="`${getMediaBackend()}/${item.image_path}`"
-                         class="rounded-borders" style="min-width: 100px; height: 75px;"/>
-                </template>
-                <template v-slot:hint>
-                  <p v-if="index === 0">Select <b>principal</b> category</p>
-                  <p v-else><b>Optional.</b> Select a subcategory</p>
-                </template>
-              </q-select>
-
-              <q-input dark standout type="url" v-model="url" label="Url"
-                       color="dark" class="q-mb-md" bottom-slots
-              >
-                <template v-slot:hint>
-                  <b>Optional.</b> Link for more information
-                </template>
-              </q-input>
-
-              <q-input dark standout v-model="description" label="Description"
-                       type="textarea" class="q-mb-md" bottom-slots color="dark"
-              >
-                <template v-slot:hint>
-                  HTML/BB code is <b>not</b> alowed
-                </template>
-              </q-input>
-
-              <q-file dark standout v-model="torrent_file" label="Torrent file *"
-                      accept="application/x-bittorrent" class="q-mb-md" color="dark"
-              />
-
+          <q-card-section>
+            <div class="text-subtitle1">
+              When you create the torrent, don't leave the tracker URL section blank, if you don't know what to put, add
+              the following:
+              <b class="text-subtitle2 text-app-color-primary">{{ announce }}</b>
             </div>
 
-            <div class="col-12 col-sm-6 q-pl-sm">
-              <q-file name="cover_images" v-model="torrentImages" accept="image/*"
-                      dark standout multiple use-chips append label="Select Torrent Images"
-                      bottom-slots @update:model-value="val => getImageSrc(val)"
-              >
-                <template v-slot:hint>
-                  First image will be the <b>principal</b> cover
-                </template>
-              </q-file>
-
-              <!-- Image gallery -->
-              <!--              <div class="row q-mt-sm">-->
-              <!--                <div class="col-6 col-sm-4 q-pa-sm" v-for="(image, index) in torrentImagesBase64" :key="index">-->
-              <!--                  <q-card>-->
-              <!--                    <q-img :src="image.base64">-->
-              <!--                      <div class="absolute-bottom text-subtitle2 text-center">-->
-              <!--                        {{ image.name }}-->
-              <!--                      </div>-->
-              <!--                      <q-icon class="absolute all-pointer-events" size="32px"-->
-              <!--                              name="close" color="red" style="top: 8px; right: 8px"-->
-              <!--                              @click="deleteImge(image)">-->
-              <!--                        <q-tooltip>-->
-              <!--                          Delete-->
-              <!--                        </q-tooltip>-->
-              <!--                      </q-icon>-->
-              <!--                    </q-img>-->
-              <!--                  </q-card>-->
-              <!--                </div>-->
-              <!--              </div>-->
-
-              <masonry-wall class="q-mt-md" v-if="switchMansonry" :items="torrentImagesBase64" :ssr-columns="1"
-                            :column-width="150" :gap="10">
-                <template #default="{ item }">
-                  <q-img :src="`${item.base64}`">
-                    <div class="absolute-bottom text-caption text-center">
-                      {{ item.name }}
-                    </div>
-                    <q-icon class="absolute all-pointer-events" size="32px"
-                            name="close" color="red" style="top: 8px; right: 8px"
-                            @click="deleteImage(item)">
-                      <q-tooltip>
-                        Delete
-                      </q-tooltip>
-                    </q-icon>
-                  </q-img>
-                </template>
-              </masonry-wall>
-
+            <div class="text-subtitle2">
+              Once the torrent is uploaded, re-download it and re-seed the files.
             </div>
+          </q-card-section>
 
-          </div>
-          <div class="row">
-            <div class="col text-center">
-              <q-toggle dark v-model="accept" label="I accept responsibility for the publication of this torrent and the files contains"/>
-              <div class="text-center">
-                <q-btn label="Submit" type="submit" color="dark" text-color="amber" :disable="!accept"
-                       :loading="loading"/>
-                <q-btn label="Reset" type="reset" flat class="q-ml-sm" color="dark" text-color="amber"/>
+          <q-card-section>
+
+            <q-form
+              @submit="onSubmit"
+              @reset="onReset"
+              class="q-gutter-md"
+              color="dark"
+            >
+
+              <div class="row">
+                <div class="col">
+<!--                  Name -->
+                  <q-input dark standout v-model="name" label="Torrent name *" color="dark"
+                           lazy-rules class="q-mb-md"
+                           :rules="[ val => val && val.length > 0 || 'Please type something']"
+                  >
+                    <template v-slot:hint>
+                      Use descriptive names
+                    </template>
+                  </q-input>
+
+                  <!--Categories-->
+                  <q-select dark standout bottom-slots v-model="categoriesSelected[index]"
+                            :options="getCategoryList()" option-label="name" v-for="(item, index) in categoriesSelected"
+                            :key="index" :label="'Category' + (index === 0 ? ' *':'')" class="q-mb-md" color="dark">
+                    <template v-slot:append v-if="categoriesSelected[index] != null">
+                      <q-icon name="close" @click.stop="deleteCategory(categoriesSelected[index])" class="cursor-pointer"/>
+                    </template>
+                    <template v-slot:after>
+                      <q-img v-if="item && item.image_path" :src="`${getMediaBackend()}/${item.image_path}`"
+                             class="rounded-borders" style="min-width: 100px; height: 75px;"/>
+                    </template>
+                    <template v-slot:hint>
+                      <p v-if="index === 0">Select <b>principal</b> category</p>
+                      <p v-else><b>Optional.</b> Select a subcategory</p>
+                    </template>
+                  </q-select>
+
+                  <!--Torrent Images-->
+                  <q-file name="cover_images" v-model="torrentImages" accept="image/*"
+                          dark color="dark" standout multiple use-chips append label="Select Torrent Images"
+                          bottom-slots @update:model-value="val => getImageSrc(val)"
+                  >
+                    <template v-slot:hint>
+                      First image will be the <b>principal</b> cover
+                    </template>
+                  </q-file>
+
+                  <!--Images preview-->
+                  <masonry-wall class="q-mt-md q-mb-md" v-if="switchMansonry" :items="torrentImagesBase64" :ssr-columns="1"
+                                :column-width="150" :gap="10">
+                    <template #default="{ item }">
+                      <q-img :src="`${item.base64}`">
+                        <div class="absolute-bottom text-caption text-center">
+                          {{ item.name }}
+                        </div>
+                        <q-icon class="absolute all-pointer-events" size="32px"
+                                name="close" color="red" style="top: 8px; right: 8px"
+                                @click="deleteImage(item)">
+                          <q-tooltip>
+                            Delete
+                          </q-tooltip>
+                        </q-icon>
+                      </q-img>
+                    </template>
+                  </masonry-wall>
+
+                  <!--URL-->
+                  <q-input dark standout type="url" v-model="url" label="Url"
+                           color="dark" class="q-mb-md" bottom-slots
+                  >
+                    <template v-slot:hint>
+                      <b>Optional.</b> Link for more information
+                    </template>
+                  </q-input>
+
+                  <!--Description-->
+                  <q-input dark standout v-model="description" label="Description"
+                           type="textarea" class="q-mb-md" bottom-slots color="dark"
+                  >
+                    <template v-slot:hint>
+                      HTML/BB code is <b>not</b> alowed
+                    </template>
+                  </q-input>
+
+                  <!--Torrent File-->
+                  <q-file dark standout v-model="torrent_file" label="Torrent file *"
+                          accept="application/x-bittorrent" class="q-mb-md" color="dark"
+                  />
+
+                </div>
+
               </div>
-            </div>
-          </div>
+              <div class="row">
+                <div class="col text-center">
+                  <q-toggle dark v-model="accept"
+                            label="I accept responsibility for the publication of this torrent and the files contains"/>
+                  <div class="text-center">
+                    <q-btn label="Submit" type="submit" color="dark" text-color="amber" :disable="!accept"
+                           :loading="loading"/>
+                    <q-btn label="Reset" type="reset" flat class="q-ml-sm" color="dark" text-color="amber"/>
+                  </div>
+                </div>
+              </div>
 
-        </q-form>
-      </q-card-section>
+            </q-form>
+          </q-card-section>
+
+        </q-card>
+      </div>
     </div>
 
   </q-page>
@@ -328,4 +318,5 @@ export default {
   }
 }
 </script>
+
 
