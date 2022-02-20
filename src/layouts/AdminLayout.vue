@@ -28,56 +28,64 @@ const linksList = [
     caption: "General preview",
     icon: "dashboard",
     link: "/admin_panel",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "Category",
     caption: "Create, modify or delete a category",
     icon: "extension",
     link: "/admin_panel/category",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "Roles & Permissions",
     caption: "Edit roles and permissions",
     icon: "security",
     link: "/admin_panel/roles_permissions",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "Users",
     caption: "View and edit user configurations",
     icon: "people",
     link: "/admin_panel/users",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "Forum",
     caption: "Edit forums options",
     icon: "message",
     link: "/admin_panel/forum",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "HelpDesk",
     caption: "View and response user's messages",
     icon: "public",
     link: "/admin_panel/helpdesk",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "Torrents",
     caption: "Edit options of torrents",
     icon: "attach_file",
     link: "/admin_panel/torrents",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
   {
     title: "Sign Up and invitations",
     caption: "Open Sign Up and generate link invitations",
     icon: "share",
     link: "/admin_panel/signup_invitations",
-    active: false
+    active: false,
+    roles: ['admin', 'moderator']
   },
 ];
 

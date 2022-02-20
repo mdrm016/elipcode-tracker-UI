@@ -7,7 +7,7 @@ import {
 } from "vue-router";
 import routes from "./routes";
 import constants from "../constants"
-import { LocalStorage } from 'quasar'
+import auth from "src/auth";
 
 /*
  * If not building with SSR mode, you can
@@ -44,11 +44,48 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach((to, from, next) => {
-    if(!LocalStorage.getItem('currentUser') && !excludePaths.includes(to.path) ) {
-      next(constants.AUTH_URL)
-    } else {
+    let allowedToEnter = true
+    to.matched.some((record) => {
+
+      let userIsAuth = auth.isAuth()
+
+      // get the meta object
+      if ('meta' in record) {
+        let meta = record.meta
+
+        // check if user needs to be logged in to access this page
+        if ('requiresAuth' in meta) {
+          let requiresAuth = meta.requiresAuth
+          if(requiresAuth && !userIsAuth) {
+            allowedToEnter = false
+            next(constants.AUTH_URL)
+          }
+        }
+
+        //check if user has correct rol to access this page
+        if ('roles' in meta) {
+          let roles = meta.roles
+          let userRol = auth.getRol()
+          if(!roles.includes(userRol)) {
+            allowedToEnter = false
+            next("/not_allowed")
+          }
+        }
+      } else {
+        // Check auth user
+        if(!userIsAuth) {
+          allowedToEnter = false
+          next(constants.AUTH_URL)
+        }
+      }
+
+    })
+
+    // Check if allow continue
+    if(allowedToEnter) {
       next()
     }
+
   })
 
   return Router;

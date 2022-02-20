@@ -37,17 +37,19 @@
             >
               <template v-ripple v-if="col.name === 'cover'">
                 <div @click="goToTorrentView(props.row)">
-                  <q-img :src="`${getMediaBackend()}/${props.row.cover.path}`" class="rounded-borders" style="min-width: 75px; height: 100px;"/>
+                  <q-img :src="`${getMediaBackend()}/${props.row.cover.path}`" class="rounded-borders"
+                         style="min-width: 75px; height: 100px; cursor: pointer"/>
                 </div>
               </template>
               <template v-else>
-                <template v-if="col.name === 'action'">
-                  <q-btn color="amber" icon="download" round
-                         flat dense @click="downloadTorrent(props.row)"/>
-                </template>
-                <template v-else>
-                  {{ col.value }}
-                </template>
+                <!--                <template v-if="col.name === 'action'">-->
+                <!--                  <q-btn color="amber" icon="download" round-->
+                <!--                         flat dense @click="downloadTorrent(props.row)"/>-->
+                <!--                </template>-->
+                <!--                <template>-->
+                <!--                  {{ col.value }}-->
+                <!--                </template>-->
+                {{ col.value }}
               </template>
 
             </q-td>
@@ -73,7 +75,7 @@ import {date, useQuasar} from "quasar";
 import {onMounted, ref} from "vue";
 import constants from "src/constants";
 import {useRouter} from "vue-router";
-import {downloadTorrent} from "src/utils";
+import {downloadTorrent, formatBytes} from "src/utils";
 
 
 const columns = [
@@ -85,6 +87,7 @@ const columns = [
     field: row => row.categories.find(x => x.principal).name,
     sortable: true
   },
+  {name: 'name', label: 'Name', align: 'left', field: 'name', sortable: true},
   {
     name: 'date',
     label: 'Upload date',
@@ -92,10 +95,11 @@ const columns = [
     field: row => date.formatDate(row.uploaded_time, 'YYYY-MM-DD HH:mm:ss'),
     sortable: true
   },
-  {name: 'name', label: 'Name', align: 'left', field: 'name', sortable: true},
-  {name: 'seeders', align: 'center', label: 'Seeders', field: 'seeders'},
-  {name: 'leechers', align: 'center', label: 'Leechers', field: 'leechers'},
-  {name: 'action', align: 'center', label: 'Actions', field: 'action'}
+  {name: 'seeders', align: 'center', label: 'Seeders', field: 'seeders', sortable: true},
+  {name: 'leechers', align: 'center', label: 'Leechers', field: 'leechers', sortable: true},
+  {name: 'files', align: 'center', label: 'Files', field: x => x.info.files ? x.info.files.length : 1, sortable: true},
+  {name: 'size', align: 'center', label: 'Size', field: x => formatBytes(x.info.total_length), sortable: true},
+  // {name: 'action', align: 'center', label: 'Actions', field: 'action'}
 ]
 
 export default {
@@ -111,13 +115,13 @@ export default {
       sortBy: 'desc',
       descending: false,
       page: 1,
-      rowsPerPage: 20
-      // rowsNumber: xx if getting data from a server
+      rowsPerPage: 50,
+      rowsNumber: 0 //xx if getting data from a server
     })
 
     const onRequest = (props) => {
       const {page, rowsPerPage, sortBy, descending} = props.pagination
-      const filter = props.filter
+      // const filter = props.filter
 
       loading.value = true
 
@@ -166,6 +170,7 @@ export default {
       downloadTorrent,
       getMediaBackend,
       goToTorrentView,
+      formatBytes
     }
 
   }

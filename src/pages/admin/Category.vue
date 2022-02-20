@@ -31,7 +31,6 @@
                 </q-input>
               </div>
             </div>
-
           </template>
 
           <template v-slot:body="props">
@@ -52,14 +51,17 @@
                 <template v-else>
                   <template v-if="col.name === 'action'">
                     <q-btn color="amber" icon="remove_red_eye" round flat dense
-                           @click="view = 'view'; editOrViewCategory(props.row)">
+                           @click="view = 'view'; editOrViewCategory(props.row)"
+                           v-if="auth.checkPermissions('category_get')">
                       <q-tooltip>View</q-tooltip>
                     </q-btn>
                     <q-btn color="amber" icon="edit" round flat dense
-                           @click="view = 'edit'; editOrViewCategory(props.row)">
+                           @click="view = 'edit'; editOrViewCategory(props.row)"
+                           v-if="auth.checkPermissions('category_update')">
                       <q-tooltip>Edit</q-tooltip>
                     </q-btn>
-                    <q-btn color="amber" icon="delete" round flat dense @click="confirmDelete(props.row)">
+                    <q-btn color="amber" icon="delete" round flat dense @click="confirmDelete(props.row)"
+                           v-if="auth.checkPermissions('category_delete')">
                       <q-tooltip>Delete</q-tooltip>
                     </q-btn>
                   </template>
@@ -156,6 +158,8 @@ import {onMounted, ref} from "vue";
 import {HTTP} from "src/http";
 import {useRouter} from "vue-router";
 import constants from "src/constants";
+import {capitalize} from "src/utils";
+import auth from "src/auth";
 
 const columns = [
   {name: 'image', label: '', align: 'center', field: 'image'},
@@ -333,13 +337,12 @@ export default {
       imageBase64.value = null
     }
 
-    const capitalize = s => (s && s[0].toUpperCase() + s.slice(1)) || ""
-
     onMounted(() => {
       onRequest()
     })
 
     return {
+      auth,
       view,
       filter,
       columns,

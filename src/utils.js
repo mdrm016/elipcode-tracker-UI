@@ -37,3 +37,13 @@ export const downloadTorrent = (torrent) => {
       console.log(error)
     })
 }
+
+export const capitalize = s => (s && s[0].toUpperCase() + s.slice(1)) || ""
+
+export const groupBy = (xs, f) => {
+  let reduced = xs.reduce((r, v, i, a, k = f(v)) => ((r[k] || (r[k] = [])).push(v), r), []);
+  return Object.keys(reduced).map(key => {
+    return {group: key, children: reduced[key]};
+  })
+}
+

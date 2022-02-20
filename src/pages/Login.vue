@@ -66,9 +66,9 @@ export default defineComponent({
   methods: {
     login() {
       this.loginIn = true
-      auth.login(this.username, this.password).then(username => {
+      auth.login(this.username, this.password).then(() => {
         this.$router.push({path: '/'})
-        this.username = username
+        // this.username = username
       }).catch(error => {
         this.error = true
         this.errorMessage = error.message

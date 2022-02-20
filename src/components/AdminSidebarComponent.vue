@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable v-ripple @click="toView(link)" :active="active" active-class="text-orange">
+  <q-item clickable v-ripple @click="toView(link)" :active="active" active-class="text-orange" v-if="roles.includes(auth.getRol())">
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
@@ -17,6 +17,7 @@
 <script>
 import { defineComponent } from "vue";
 import {useRouter} from "vue-router";
+import auth from "src/auth";
 
 export default defineComponent({
   name: "AdminSidebarComponent",
@@ -41,6 +42,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    roles: {
+      type: Array,
+      default: () => [],
+    },
   },
   setup() {
     const router = useRouter()
@@ -50,6 +55,8 @@ export default defineComponent({
     }
 
     return {
+      auth,
+
       toView
     }
   }

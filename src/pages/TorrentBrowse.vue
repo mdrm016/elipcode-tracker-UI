@@ -12,10 +12,14 @@
               <q-card class="no-border no-shadow bg-transparent">
                 <q-card-section class="q-pa-sm">
                   <q-input dark rounded v-model="filter" outlined placeholder="Input a search criteria..."
-                           color="amber">
+                           color="amber" @keydown.enter.prevent="onRequest()">
                     <template v-slot:append>
                       <q-icon v-if="filter == null" name="search"/>
-                      <q-icon v-else name="clear" class="cursor-pointer" @click="filter = null"/>
+                      <q-icon v-else name="clear" class="cursor-pointer" @click="filter = null; onRequest()"/>
+                    </template>
+
+                    <template v-slot:after>
+                      <q-btn round dense flat :loading="loading" icon="send" @click="onRequest()" :disable="filter == null || filter === ''"/>
                     </template>
                   </q-input>
                 </q-card-section>
@@ -56,7 +60,8 @@
                         <div class="q-ma-sm q-gutter-sm">
                           <p>{{ item.name }}</p>
                           <p>{{ item.uploaded_time }}</p>
-                          <p>Size: {{ formatBytes(item.info.total_length) }} &nbsp;&nbsp; Seeders: {{item.seeders}} &nbsp; Leechers: {{item.leechers}}</p>
+                          <p>Size: {{ formatBytes(item.info.total_length) }} &nbsp;&nbsp; Seeders: {{ item.seeders }}
+                            &nbsp; Leechers: {{ item.leechers }}</p>
                           <p>{{ item.info.files.length }} files</p>
 
                           <q-separator color="grey-9" inset/>
@@ -71,6 +76,14 @@
               </q-img>
             </template>
           </masonry-wall>
+
+          <!--No Data block-->
+          <div v-if="!loading && (!torrent_list || torrent_list.length === 0)" class="full-width row flex-center q-gutter-sm">
+            <div class="text-app-color-primary text-h6">
+              <q-icon class="text-app-color-primary" size="2em" name="sentiment_very_dissatisfied"/>
+              No data
+            </div>
+          </div>
 
         </div>
 
@@ -102,24 +115,35 @@ export default {
     const loading = ref(false)
     const torrent_list = ref([])
     const pagination = ref({
-      sortBy: 'desc',
-      descending: false,
+      sortBy: 'uploaded_time',
+      descending: true,
       page: 1,
-      rowsPerPage: 50
-      // rowsNumber: xx if getting data from a server
+      rowsPerPage: 50,
+      rowsNumber: 0 //if getting data from a server
     })
 
-    const onRequest = (props) => {
-      const {page, rowsPerPage, sortBy, descending} = props.pagination
-      const filter = props.filter
+    const onRequest = () => {
+      const {page, rowsPerPage, sortBy, descending} = pagination.value
 
-      loading.value = true
+      let search = {
+        status: 'visible', //['visible', 'dead', 'all']
+        filter: filter.value
+      }
+
       $q.loading.show()
-
+      loading.value = true
       // TODO: sincronize with backend
-      HTTP.post('/search/torrents', {})
+      HTTP.post('/search/torrents', search, {
+        params: {
+          page: page ? page : null,
+          per_page: rowsPerPage ? rowsPerPage : null
+        }
+      })
         .then(response => {
           torrent_list.value = response.data.items
+          pagination.value.page = response.data.page
+          // pagination.value.rowsPerPage = response.data.per_page
+          // pagination.value.rowsNumber = response.data.row_number
         })
         .catch(error => {
           $q.notify({
@@ -129,9 +153,10 @@ export default {
             message: 'Torrent list not obtained'
           })
         })
-        .finally(() =>
+        .finally(() => {
           $q.loading.hide()
-        )
+          loading.value = false
+        })
     }
 
     const goToTorrentView = (row) => {
@@ -140,10 +165,7 @@ export default {
     }
 
     onMounted(() => {
-      onRequest({
-        pagination: pagination.value,
-        filter: undefined
-      })
+      onRequest()
     })
 
     return {
@@ -155,7 +177,8 @@ export default {
       getMediaBackend,
       downloadTorrent,
       goToTorrentView,
-      formatBytes
+      formatBytes,
+      onRequest
     }
   }
 }

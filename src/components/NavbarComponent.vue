@@ -6,7 +6,7 @@
 
       <q-separator dark vertical/>
 
-      <q-btn stretch flat label="Admin Panel" to="/admin_panel"/>
+      <q-btn stretch flat label="Admin Panel" to="/admin_panel" v-if="auth.getRol() === 'admin' || auth.getRol() === 'moderator'"/>
 
       <q-separator dark vertical/>
 
@@ -44,7 +44,7 @@
 
       <q-separator dark vertical/>
 
-      <q-btn stretch flat label="Forum" to="/forum"/>
+      <q-btn stretch flat label="Forum" to="/forum" v-if="auth.getRol() === 'admin'"/>
 
       <q-separator dark vertical/>
 
@@ -57,15 +57,15 @@
 
       <div class="q-ml-md q-mr-md navbar-item">
         <div class="text-body2 text-white text-center text-weight-light navbar-option" @click="redirectTo('/profile')">
-          <q-icon name="north" color="green" size="sm" style="font-weight: bold"/> {{userStatistics.downloads}}
+          <q-icon name="north" color="green" size="sm" style="font-weight: bold"/> {{userStatistics.uploads}}
           &nbsp;
-          <q-icon name="south" color="red" size="sm" style="font-weight: bold"/> {{userStatistics.uploads}}
+          <q-icon name="south" color="red" size="sm" style="font-weight: bold"/> {{userStatistics.downloads}}
         </div>
       </div>
 
       <div class="q-ml-md q-mr-md navbar-item">
         <div class="text-body2 text-white text-center text-weight-light navbar-option">
-          Ratio: {{ userStatistics.downloaded !== 0 ? (userStatistics.uploaded/userStatistics.downloaded) : '&infin;' }}
+          Ratio: {{ userStatistics.downloaded !== 0 ? (userStatistics.uploaded/userStatistics.downloaded).toFixed(2) : '&infin;' }}
         </div>
         <div class="text-body2 text-white text-center text-weight-light navbar-option">Bonus: {{userStatistics.seed_bonus}}</div>
       </div>
@@ -84,7 +84,7 @@
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup tabindex="0" to="/messages">
+          <q-item clickable v-close-popup tabindex="0" to="/messages" v-if="auth.getRol() === 'admin'">
             <q-item-section avatar>
               <q-avatar icon="message" color="dark" text-color="amber"/>
             </q-item-section>
@@ -93,7 +93,7 @@
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup tabindex="0" to="/mytorrents">
+          <q-item clickable v-close-popup tabindex="0" to="/mytorrents" v-if="auth.getRol() === 'admin'">
             <q-item-section avatar>
               <q-avatar icon="folder_open" color="dark" text-color="amber"/>
             </q-item-section>
@@ -116,7 +116,7 @@
 
       </q-btn-dropdown>
 
-      <q-btn-dropdown stretch flat label="Support" style="background: none">
+      <q-btn-dropdown stretch flat label="Support" style="background: none" v-if="auth.getRol() === 'admin'">
         <q-list color="dark">
 
           <q-item clickable v-close-popup tabindex="0" to="/perfil">
@@ -155,7 +155,7 @@
 </template>
 
 <script>
-import {LocalStorage, useQuasar} from "quasar";
+import {useQuasar} from "quasar";
 import auth from "src/auth";
 import {useRouter} from "vue-router";
 import {HTTP} from "src/http";
@@ -196,9 +196,11 @@ export default {
       onRequest()
     })
 
+    //TODO: sincronizar periodicamente las estadisticas
     return {
-      username: LocalStorage.getItem('currentUser'),
+      username: auth.getUsername(),
       userStatistics,
+      auth,
 
       logout,
       redirectTo,
