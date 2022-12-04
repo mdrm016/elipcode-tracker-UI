@@ -156,9 +156,9 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: `elipcode-tracker-ui`,
-        short_name: `elipcode-tracker-ui`,
-        description: `A UI for elipcode tracker.`,
+        name: `bodymuscle-tracker-ui`,
+        short_name: `bodymuscle-tracker-ui`,
+        description: `A UI for BodyMuscle tracker.`,
         display: "standalone",
         orientation: "portrait",
         background_color: "#ffffff",
@@ -221,7 +221,7 @@ module.exports = configure(function (ctx) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: "elipcode-tracker-ui",
+        appId: "bodymuscle-tracker-ui",
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
