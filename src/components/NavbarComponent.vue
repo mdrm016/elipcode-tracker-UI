@@ -2,7 +2,7 @@
   <q-header elevated>
     <q-toolbar class="bg-black text-amber-14">
 
-      <q-btn stretch flat label="BodyMuscle Tracker" to="/"/>
+      <q-btn stretch flat label="Elipcode Tracker" to="/"/>
 
       <q-separator dark vertical/>
 

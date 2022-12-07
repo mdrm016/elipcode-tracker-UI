@@ -1,8 +1,8 @@
 {
-  "name": "bodymuscle-tracker-ui",
+  "name": "elipcode-tracker-ui",
   "version": "0.0.1",
-  "description": "A UI for BodyMuscle tracker.",
-  "productName": "bodymuscle-tracker-ui",
+  "description": "A UI for Elipcode tracker.",
+  "productName": "elipcode-tracker-ui",
   "author": "bodymuscle",
   "private": true,
   "scripts": {
