@@ -21,7 +21,7 @@
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup tabindex="0" to="/torrentlist">
+          <q-item clickable v-close-popup tabindex="0" to="/torrentlist" v-if="auth.getRol() === 'admin' || auth.getRol() === 'moderator'">
             <q-item-section avatar>
               <q-avatar icon="list" color="dark" text-color="amber"/>
             </q-item-section>
@@ -72,6 +72,39 @@
 
       <q-space/>
 
+      <q-btn-dropdown stretch flat label="Support" style="background: none" v-if="auth.getRol() === 'admin'">
+        <q-list color="dark">
+
+          <q-item clickable v-close-popup tabindex="0" to="/perfil">
+            <q-item-section avatar>
+              <q-avatar icon="done" color="dark" text-color="amber"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="menu-item-style">Rules</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup tabindex="0" to="/perfil">
+            <q-item-section avatar>
+              <q-avatar icon="info" color="dark" text-color="amber"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="menu-item-style">FAQ</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup tabindex="0" to="/perfil">
+            <q-item-section avatar>
+              <q-avatar icon="textsms" color="dark" text-color="amber"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="menu-item-style">Helpdesk</q-item-label>
+            </q-item-section>
+          </q-item>
+
+        </q-list>
+      </q-btn-dropdown>
+
       <q-btn-dropdown stretch flat :label="username" style="background: none">
         <q-list color="dark">
 
@@ -112,40 +145,6 @@
               <q-item-label class="menu-item-style">Exit</q-item-label>
             </q-item-section>
           </q-item>
-        </q-list>
-
-      </q-btn-dropdown>
-
-      <q-btn-dropdown stretch flat label="Support" style="background: none" v-if="auth.getRol() === 'admin'">
-        <q-list color="dark">
-
-          <q-item clickable v-close-popup tabindex="0" to="/perfil">
-            <q-item-section avatar>
-              <q-avatar icon="done" color="dark" text-color="amber"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="menu-item-style">Rules</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-close-popup tabindex="0" to="/perfil">
-            <q-item-section avatar>
-              <q-avatar icon="info" color="dark" text-color="amber"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="menu-item-style">FAQ</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-close-popup tabindex="0" to="/perfil">
-            <q-item-section avatar>
-              <q-avatar icon="textsms" color="dark" text-color="amber"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="menu-item-style">Helpdesk</q-item-label>
-            </q-item-section>
-          </q-item>
-
         </q-list>
       </q-btn-dropdown>
 
